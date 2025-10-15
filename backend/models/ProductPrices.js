@@ -35,6 +35,11 @@ const ProductPrice = sequelize.define(
         max: 999
       }
     },
+    unit: {
+      type: DataTypes.ENUM('mg', 'gm', 'ml', 'kg', 'ltr'),
+      allowNull: false,
+      defaultValue: 'mg'
+    },
   },
   {
     tableName: "product_prices",

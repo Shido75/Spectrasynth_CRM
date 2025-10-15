@@ -17,7 +17,7 @@ exports.addProductPrices = async (req, res) => {
 
  
     for (const entry of prices) {
-      const { company, price, quantity } = entry;
+      const { company, price, quantity, unit } = entry;
 
    
       let productPrice = await ProductPrice.findOne({
@@ -28,8 +28,9 @@ exports.addProductPrices = async (req, res) => {
        
         productPrice.price = price;
         productPrice.quantity = quantity || 0;
+        productPrice.unit = unit || 'mg';
         await productPrice.save();
-        results.push({ company, price, quantity: productPrice.quantity, status: "updated" });
+        results.push({ company, price, quantity: productPrice.quantity, unit: productPrice.unit, status: "updated" });
       } else {
         
         const newProductPrice = await ProductPrice.create({
@@ -37,8 +38,9 @@ exports.addProductPrices = async (req, res) => {
           company,
           price,
           quantity: quantity || 0,
+          unit: unit || 'mg',
         });
-        results.push({ company, price, quantity: newProductPrice.quantity, status: "created" });
+        results.push({ company, price, quantity: newProductPrice.quantity, unit: newProductPrice.unit, status: "created" });
       }
     }
 
@@ -59,7 +61,7 @@ exports.getAllProductsWithPrices = async (req, res) => {
       include: [
         {
           model: ProductPrice,
-          attributes: ["id", "company", "price", "quantity", "createdAt", "updatedAt"],
+          attributes: ["id", "company", "price", "quantity", "unit", "createdAt", "updatedAt"],
         },
       ],
       attributes: ["id", "product_name", "cas_number", "product_code", "status"],
