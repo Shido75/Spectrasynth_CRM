@@ -146,15 +146,17 @@ function ProductList() {
                 <thead>
                   <tr>
                     <th>Name</th>
+                    <th>CAS No</th>
                     <th>Company</th>
                     <th>Price</th>
+                    <th>Quantity</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredProducts.length === 0 ? (
                     <tr>
-                      <td colSpan="4" className="text-center">
+                      <td colSpan="6" className="text-center">
                         No matching products found.
                       </td>
                     </tr>
@@ -167,6 +169,8 @@ function ProductList() {
                         return (
                           <tr key={product.id}>
                             <td>{product.product_name}</td>
+                            <td>{product.cas_number || "N/A"}</td>
+                            <td>N/A</td>
                             <td>N/A</td>
                             <td>N/A</td>
                             <td>-</td>
@@ -177,8 +181,10 @@ function ProductList() {
                       return product.ProductPrices.map((price) => (
                         <tr key={`${product.id}-${price.id}`}>
                           <td>{product.product_name}</td>
+                          <td>{product.cas_number || "N/A"}</td>
                           <td>{price.company}</td>
                           <td>₹{price.price}</td>
+                          <td>{price.quantity || 0}</td>
                           <td>
                             <Link
                               className="btn btn-warning btn-sm me-1"

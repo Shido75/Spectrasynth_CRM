@@ -5,7 +5,8 @@ import axios from "axios";
 function AddProduct() {
   const [products, setProducts] = useState([]); // fetched products
   const [productName, setProductName] = useState(""); // selected product
-  const [prices, setPrices] = useState([{ company: "", price: "" }]);
+  const [selectedProduct, setSelectedProduct] = useState(null); // selected product object
+  const [prices, setPrices] = useState([{ company: "", price: "", quantity: "" }]);
   const navigate = useNavigate();
 
   // Fetch all products on component mount
@@ -40,7 +41,7 @@ function AddProduct() {
   };
 
   const addPriceField = () =>
-    setPrices([...prices, { company: "", price: "" }]);
+    setPrices([...prices, { company: "", price: "", quantity: "" }]);
   const removePriceField = (index) =>
     setPrices(prices.filter((_, i) => i !== index));
 
@@ -79,7 +80,11 @@ function AddProduct() {
             <select
               className="form-control"
               value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              onChange={(e) => {
+                setProductName(e.target.value);
+                const selected = products.find(p => p.product_name === e.target.value);
+                setSelectedProduct(selected || null);
+              }}
               required
             >
               <option value="">Select Product</option>
@@ -89,6 +94,18 @@ function AddProduct() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* CAS No Display Field */}
+          <div className="mb-3">
+            <label>CAS No</label>
+            <input
+              type="text"
+              className="form-control"
+              value={selectedProduct?.cas_number || "N/A"}
+              readOnly
+              style={{ backgroundColor: "#f8f9fa" }}
+            />
           </div>
 
           {prices.map((entry, index) => (
@@ -109,6 +126,18 @@ function AddProduct() {
                 className="form-control mb-1"
                 value={entry.price}
                 onChange={(e) => handlePriceChange(index, e)}
+                required
+              />
+              <label>Quantity</label>
+              <input
+                type="number"
+                name="quantity"
+                className="form-control mb-1"
+                value={entry.quantity}
+                onChange={(e) => handlePriceChange(index, e)}
+                min="0"
+                max="999"
+                placeholder="0-999"
                 required
               />
               {prices.length > 1 && (

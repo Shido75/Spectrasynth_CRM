@@ -59,7 +59,7 @@ exports.getAllProductsWithPrices = async (req, res) => {
       include: [
         {
           model: ProductPrice,
-          attributes: ["id", "company", "price", "createdAt", "updatedAt"],
+          attributes: ["id", "company", "price", "quantity", "createdAt", "updatedAt"],
         },
       ],
       attributes: ["id", "product_name", "cas_number", "product_code", "status"],

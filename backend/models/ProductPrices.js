@@ -26,6 +26,15 @@ const ProductPrice = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      validate: {
+        min: 0,
+        max: 999
+      }
+    },
   },
   {
     tableName: "product_prices",
