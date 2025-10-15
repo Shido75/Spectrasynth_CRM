@@ -1,0 +1,125 @@
+I understand you want to make UI/UX improvements to the inquiry and product management sections of your frontend application. Let me break down what you're requesting:
+
+## Changes Needed
+
+### 1. Inquiries List Page (`http://localhost:3000/dashboard/Inquiry`)
+
+**UI Modifications:**
+- **Remove Delete Button**: Remove the delete action from the Actions column in the inquiries table
+- **Column Header Change**: "Customer Name" → "Employee Name" 
+- **Column Header Change**: "Days Since Inquiry" → "Date Inquiry"
+
+**Business Logic Impact:**
+- This suggests inquiries are now being tracked by employee rather than customer
+- Date display preference changed from relative time ("X days ago") to absolute date format
+
+### 2. Product Management Section
+
+**Location**: Likely within the inquiry workflow or product selection interface
+**UI Modifications:**
+- **Add CAS Number**: Display CAS number field after the product name field
+- **Field Reordering**: Move quantity field to appear after the price field
+
+### 3. Product List Page (`http://localhost:3000/dashboard/ProductList`)
+
+**UI Modifications:**
+- **Add Quantity Column**: Insert quantity field/column after the price column in the product listing
+
+## What I Understand About Your Requirements
+
+### Frontend Architecture Implications:
+- You have a React/frontend application running on port 3000
+- The backend API (port 8000) will likely need to support these UI changes
+- Table/list components need column reordering and field additions
+
+### Data Model Considerations:
+- Employee tracking instead of customer tracking for inquiries
+- CAS numbers are important for chemical product identification (fits your pharmaceutical business)
+- Quantity management is becoming more prominent in the UI
+
+### User Experience Goals:
+- Simplifying inquiry management (removing delete functionality)
+- Making chemical product identification easier (CAS numbers)
+- Better inventory/quantity visibility
+
+## Frontend Files Likely Affected:
+- Inquiry list component/page
+- Product management components
+- Table/grid components
+- Potentially API calls to match new data requirements
+
+Would you like me to help locate the frontend code files and implement these changes? I'll need to explore your frontend directory structure first.
+
+
+
+
+## Product Requirements Document (PRD) - Product List UI Enhancement
+
+### Overview
+Enhance the Product List page at `http://localhost:3000/dashboard/ProductList` to display additional critical product information (CAS numbers and quantities) in a more user-friendly column arrangement.
+
+## What I Understand
+
+### Current State Analysis
+- **Existing Product List**: Currently displays products with basic information including name and price
+- **Missing Key Data**: CAS numbers and quantities are not visible in the main product listing
+- **User Pain Point**: Users likely need to navigate to individual product details to see CAS numbers and inventory levels
+
+### Business Context
+- **Chemical Industry Requirements**: CAS (Chemical Abstracts Service) numbers are critical identifiers for chemical products in pharmaceutical/chemical industry
+- **Inventory Visibility**: Quantity information is essential for sales and inventory management
+- **User Workflow**: Sales team and technical staff need quick access to both chemical identifiers and stock levels
+
+## Requirements
+
+### 1. ProductList Table Enhancement (`/dashboard/ProductList`)
+
+**New Column Structure (Left to Right):**
+1. Product Name *(existing)*
+2. **CAS Number** *(new column)*
+3. Price *(existing)*
+4. **Quantity** *(new column)*
+5. Other existing columns...
+
+**Data Requirements:**
+- **CAS Number Field**: Display chemical CAS registry numbers for product identification
+- **Quantity Field**: Show current available stock/inventory quantity
+- **Column Headers**: Clear, professional labeling
+- **Data Formatting**: Proper alignment and formatting for numerical data
+
+### 2. User Experience Goals
+
+**Improved Information Architecture:**
+- Critical product identifiers (CAS) immediately visible after product names
+- Inventory levels visible alongside pricing information
+- Logical flow: Identity → Chemical ID → Price → Availability
+
+**Business Benefits:**
+- Faster product identification for technical inquiries
+- Immediate inventory visibility for sales decisions
+- Reduced clicks/navigation for common product information
+- Better support for chemical industry workflows
+
+## Technical Considerations
+
+### Frontend Implementation Needs:
+- **Component Updates**: ProductList table/grid component modifications
+- **API Integration**: Ensure backend provides CAS and quantity data
+- **Responsive Design**: New columns must work on different screen sizes
+- **Data Loading**: Handle cases where CAS or quantity data might be missing
+
+### Backend Data Requirements:
+- **Product Model**: Verify CAS number and quantity fields exist
+- **API Endpoints**: Ensure ProductList API returns complete product data
+- **Data Validation**: Proper formatting and validation for CAS numbers
+
+### Data Flow Understanding:
+1. **Frontend Request**: ProductList page requests complete product data
+2. **Backend Response**: API returns products with name, CAS, price, quantity
+3. **UI Rendering**: Table displays data in specified column order
+4. **User Interaction**: Users can sort/filter by any column including new ones
+
+## Expected Outcome
+A more comprehensive product listing that provides essential chemical product information at a glance, improving workflow efficiency for sales and technical teams working with pharmaceutical/chemical products.
+
+The enhanced table will serve as a central hub for product information without requiring drill-down navigation for basic but critical data points.
