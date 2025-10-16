@@ -6,7 +6,12 @@ function AddProduct() {
   const [products, setProducts] = useState([]); // fetched products
   const [productName, setProductName] = useState(""); // selected product
   const [selectedProduct, setSelectedProduct] = useState(null); // selected product object
-  const [prices, setPrices] = useState([{ company: "", price: "", quantity: "", unit: "mg" }]);
+  const [companies, setCompanies] = useState([
+    {
+      company: "",
+      priceEntries: [{ price: "", quantity: "", unit: "mg" }]
+    }
+  ]);
   const navigate = useNavigate();
 
   // Fetch all products on component mount
@@ -34,19 +39,59 @@ function AddProduct() {
     fetchProducts();
   }, []);
 
-  const handlePriceChange = (index, e) => {
-    const newPrices = [...prices];
-    newPrices[index][e.target.name] = e.target.value;
-    setPrices(newPrices);
+  const handleCompanyNameChange = (companyIndex, value) => {
+    const newCompanies = [...companies];
+    newCompanies[companyIndex].company = value;
+    setCompanies(newCompanies);
   };
 
-  const addPriceField = () =>
-    setPrices([...prices, { company: "", price: "", quantity: "", unit: "mg" }]);
-  const removePriceField = (index) =>
-    setPrices(prices.filter((_, i) => i !== index));
+  const handlePriceEntryChange = (companyIndex, priceIndex, field, value) => {
+    const newCompanies = [...companies];
+    newCompanies[companyIndex].priceEntries[priceIndex][field] = value;
+    setCompanies(newCompanies);
+  };
+
+  const addCompany = () => {
+    setCompanies([...companies, {
+      company: "",
+      priceEntries: [{ price: "", quantity: "", unit: "mg" }]
+    }]);
+  };
+
+  const removeCompany = (companyIndex) => {
+    setCompanies(companies.filter((_, i) => i !== companyIndex));
+  };
+
+  const addPriceEntry = (companyIndex) => {
+    const newCompanies = [...companies];
+    if (newCompanies[companyIndex].priceEntries.length < 2) {
+      newCompanies[companyIndex].priceEntries.push({ price: "", quantity: "", unit: "mg" });
+      setCompanies(newCompanies);
+    }
+  };
+
+  const removePriceEntry = (companyIndex, priceIndex) => {
+    const newCompanies = [...companies];
+    newCompanies[companyIndex].priceEntries = newCompanies[companyIndex].priceEntries.filter((_, i) => i !== priceIndex);
+    setCompanies(newCompanies);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Convert nested structure back to flat structure for backend compatibility
+    const prices = [];
+    companies.forEach(company => {
+      company.priceEntries.forEach(entry => {
+        prices.push({
+          company: company.company,
+          price: entry.price,
+          quantity: entry.quantity,
+          unit: entry.unit
+        });
+      });
+    });
+    
     try {
       const response = await axios.post(
         "http://localhost:8000/api/product_prices",
@@ -108,84 +153,109 @@ function AddProduct() {
             />
           </div>
 
-          {prices.map((entry, index) => (
-            <div key={index} className="mb-4 p-3 border rounded">
+          {companies.map((companyData, companyIndex) => (
+            <div key={companyIndex} className="mb-4 p-3 border rounded">
               {/* Company Name - Full Width */}
               <div className="mb-3">
-                <label className="form-label">Company Name</label>
+                <label className="form-label fw-bold">Company Name</label>
                 <input
                   type="text"
-                  name="company"
                   className="form-control"
-                  value={entry.company}
-                  onChange={(e) => handlePriceChange(index, e)}
+                  value={companyData.company}
+                  onChange={(e) => handleCompanyNameChange(companyIndex, e.target.value)}
+                  placeholder="Enter company name"
                   required
                 />
               </div>
 
-              {/* Pricing Info - Horizontal Layout */}
-              <div className="mb-3">
-                <label className="form-label">Pricing Information</label>
-                <div className="row g-2">
-                  {/* Price Input */}
-                  <div className="col-12 col-sm-4">
-                    <label className="form-label small text-muted">Price (₹)</label>
-                    <input
-                      type="number"
-                      name="price"
-                      className="form-control form-control-sm"
-                      value={entry.price}
-                      onChange={(e) => handlePriceChange(index, e)}
-                      placeholder="0.00"
-                      step="0.01"
-                      min="0"
-                      required
-                    />
+              {/* Price Entries */}
+              {companyData.priceEntries.map((priceEntry, priceIndex) => (
+                <div key={priceIndex} className="mb-3 p-2 bg-light rounded">
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <label className="form-label mb-0">Price Entry {priceIndex + 1}</label>
+                    {companyData.priceEntries.length > 1 && (
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => removePriceEntry(companyIndex, priceIndex)}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    )}
                   </div>
+                  
+                  <div className="row g-2">
+                    {/* Price Input - First */}
+                    <div className="col-12 col-sm-4">
+                      <label className="form-label small text-muted">Price (₹)</label>
+                      <input
+                        type="number"
+                        className="form-control form-control-sm"
+                        value={priceEntry.price}
+                        onChange={(e) => handlePriceEntryChange(companyIndex, priceIndex, 'price', e.target.value)}
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        required
+                      />
+                    </div>
 
-                  {/* Unit Selector */}
-                  <div className="col-12 col-sm-3">
-                    <label className="form-label small text-muted">Unit</label>
-                    <select
-                      name="unit"
-                      className="form-select form-select-sm"
-                      value={entry.unit}
-                      onChange={(e) => handlePriceChange(index, e)}
-                      required
-                    >
-                      <option value="mg">mg</option>
-                      <option value="gm">gm</option>
-                      <option value="ml">ml</option>
-                      <option value="kg">kg</option>
-                      <option value="ltr">ltr</option>
-                    </select>
-                  </div>
+                    {/* Quantity Input - Second */}
+                    <div className="col-12 col-sm-4">
+                      <label className="form-label small text-muted">Quantity</label>
+                      <input
+                        type="number"
+                        className="form-control form-control-sm"
+                        value={priceEntry.quantity}
+                        onChange={(e) => handlePriceEntryChange(companyIndex, priceIndex, 'quantity', e.target.value)}
+                        min="0"
+                        max="999"
+                        placeholder="0-999"
+                        required
+                      />
+                    </div>
 
-                  {/* Quantity Input */}
-                  <div className="col-12 col-sm-5">
-                    <label className="form-label small text-muted">Quantity</label>
-                    <input
-                      type="number"
-                      name="quantity"
-                      className="form-control form-control-sm"
-                      value={entry.quantity}
-                      onChange={(e) => handlePriceChange(index, e)}
-                      min="0"
-                      max="999"
-                      placeholder="0-999"
-                      required
-                    />
+                    {/* Unit Selector - Third */}
+                    <div className="col-12 col-sm-4">
+                      <label className="form-label small text-muted">Unit</label>
+                      <select
+                        className="form-select form-select-sm"
+                        value={priceEntry.unit}
+                        onChange={(e) => handlePriceEntryChange(companyIndex, priceIndex, 'unit', e.target.value)}
+                        required
+                      >
+                        <option value="mg">mg</option>
+                        <option value="gm">gm</option>
+                        <option value="ml">ml</option>
+                        <option value="kg">kg</option>
+                        <option value="ltr">ltr</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
 
-              {/* Remove Button */}
-              {prices.length > 1 && (
+              {/* Add Price Entry Button */}
+              {companyData.priceEntries.length < 2 && (
+                <div className="mb-3">
+                  <button
+                    type="button"
+                    className="btn btn-outline-success btn-sm"
+                    onClick={() => addPriceEntry(companyIndex)}
+                  >
+                    <i className="fas fa-plus me-1"></i>
+                    Add Price Entry
+                  </button>
+                </div>
+              )}
+
+              {/* Remove Company Button */}
+              {companies.length > 1 && (
                 <div className="d-flex justify-content-end">
                   <button
                     type="button"
                     className="btn btn-outline-danger btn-sm"
-                    onClick={() => removePriceField(index)}
+                    onClick={() => removeCompany(companyIndex)}
                   >
                     <i className="fas fa-trash-alt me-1"></i>
                     Remove Company
@@ -199,7 +269,7 @@ function AddProduct() {
             <button
               type="button"
               className="btn btn-outline-primary"
-              onClick={addPriceField}
+              onClick={addCompany}
             >
               <i className="fas fa-plus me-2"></i>
               Add Another Company
