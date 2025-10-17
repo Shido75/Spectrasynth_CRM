@@ -5,6 +5,8 @@ import Swal from "sweetalert2";
 const Inquiry = () => {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   // Fetch all inquiries
   const fetchInquiries = async () => {
@@ -62,6 +64,38 @@ const Inquiry = () => {
   useEffect(() => {
     fetchInquiries();
   }, []);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(inquiries.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentInquiries = inquiries.slice(startIndex, endIndex);
+
+  // Pagination handlers
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Generate page numbers array
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+    return pageNumbers;
+  };
 
   // Handle forwarding inquiry
   const handleEvaluate = async (inquiry_number) => {
@@ -167,7 +201,7 @@ const Inquiry = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {inquiries.map((inquiry) => (
+                    {currentInquiries.map((inquiry) => (
                       <tr key={inquiry.inquiry_number}>
                         <td>{inquiry.inquiry_number}</td>
                         <td>{inquiry.customer_name}</td>
@@ -222,6 +256,58 @@ const Inquiry = () => {
                     ))}
                   </tbody>
                 </table>
+
+                {/* Pagination Info */}
+                {inquiries.length > 0 && (
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                      <span className="text-muted">
+                        Showing {startIndex + 1} to {Math.min(endIndex, inquiries.length)} of {inquiries.length} inquiries
+                      </span>
+                    </div>
+                    
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <nav aria-label="Inquiries pagination">
+                        <ul className="pagination mb-0">
+                          {/* Previous Button */}
+                          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                            <button 
+                              className="page-link" 
+                              onClick={handlePrevious}
+                              disabled={currentPage === 1}
+                            >
+                              Previous
+                            </button>
+                          </li>
+                          
+                          {/* Page Numbers */}
+                          {getPageNumbers().map((pageNumber) => (
+                            <li key={pageNumber} className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}>
+                              <button 
+                                className="page-link" 
+                                onClick={() => handlePageChange(pageNumber)}
+                              >
+                                {pageNumber}
+                              </button>
+                            </li>
+                          ))}
+                          
+                          {/* Next Button */}
+                          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                            <button 
+                              className="page-link" 
+                              onClick={handleNext}
+                              disabled={currentPage === totalPages}
+                            >
+                              Next
+                            </button>
+                          </li>
+                        </ul>
+                      </nav>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -8,6 +8,11 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,14 +85,22 @@ const Login = () => {
 
                   <div className="mb-3">
                     <label className="col-form-label">Password</label>
-                    <div className="pass-group">
+                    <div className="pass-group position-relative">
                       <input
-                        type="password"
-                        className="pass-input form-control"
+                        type={showPassword ? "text" : "password"}
+                        className="pass-input form-control pe-5"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                       />
+                      <button
+                        type="button"
+                        className="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 text-decoration-none"
+                        onClick={togglePasswordVisibility}
+                        style={{ zIndex: 5, border: 'none', background: 'transparent' }}
+                      >
+                        <i className={`ti ${showPassword ? 'ti-eye-off' : 'ti-eye'} text-muted`}></i>
+                      </button>
                     </div>
                   </div>
 
